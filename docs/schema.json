@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bonsai.github.io/hyoujou-as-language/schema.json",
+  "title": "Hyoujou as Language Annotation",
+  "description": "顔の動きの観察と意味の解釈仮説を分離して記録する初期スキーマ。",
+  "type": "object",
+  "required": ["record_id", "source", "observation", "interpretation", "annotation"],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "description": "注釈レコードの一意なID"
+    },
+    "source": {
+      "type": "object",
+      "required": ["source_id", "license_or_consent"],
+      "properties": {
+        "source_id": { "type": "string" },
+        "license_or_consent": { "type": "string" },
+        "start_seconds": { "type": "number", "minimum": 0 },
+        "end_seconds": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": ["events", "limitations"],
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["feature", "description", "start_seconds", "end_seconds"],
+            "properties": {
+              "feature": {
+                "type": "string",
+                "enum": ["eyes", "eyelids", "eyebrows", "mouth", "lips", "jaw", "gaze", "head_pose", "hand", "body", "voice", "environment", "other"]
+              },
+              "description": { "type": "string" },
+              "start_seconds": { "type": "number", "minimum": 0 },
+              "end_seconds": { "type": "number", "minimum": 0 },
+              "evidence": { "type": "array", "items": { "type": "string" } },
+              "visibility": { "type": "string", "enum": ["clear", "partial", "occluded", "unknown"], "default": "unknown" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "interpretation": {
+      "type": "object",
+      "required": ["hypotheses", "status"],
+      "properties": {
+        "hypotheses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["claim", "confidence"],
+            "properties": {
+              "claim": { "type": "string" },
+              "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+              "basis": { "type": "array", "items": { "type": "string" } },
+              "context_used": { "type": "array", "items": { "type": "string" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "status": { "type": "string", "enum": ["tentative", "ambiguous", "insufficient_evidence", "not_assessed"] }
+      },
+      "additionalProperties": false
+    },
+    "annotation": {
+      "type": "object",
+      "required": ["annotator_id", "guideline_version"],
+      "properties": {
+        "annotator_id": { "type": "string" },
+        "guideline_version": { "type": "string" },
+        "annotated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
